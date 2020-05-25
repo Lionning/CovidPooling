@@ -5,7 +5,8 @@ Created on Sat Apr 25 09:00:07 2020
 
 @author: mallein
 
-Copy of TestBayesien for the purpose of testing
+Simulation of a Bayesian implementation of the measure of the prevalence
+based on group testing.
 """
 
 import numpy as np
@@ -133,7 +134,7 @@ def measureOfPrevalenceUnidim(prevalence, nombreTests,Nmax,step):
     plt.plot(listeMed)
     plt.plot(listeBi)
     plt.plot(listeBs)
-    plt.savefig("images/copymeasureOfPrevalenceUniDim.pdf")
+    plt.savefig("images/measureOfPrevalenceUniDim.pdf")
     plt.show()
     plt.clf()
     fichier = open('csvForImage/measureOfPrevalenceUniDim.csv','w')
@@ -268,48 +269,23 @@ def measureOfPrevalenceBidim(prev1, prev2, ratio, nombreTests,Nmax,step):
         print(test)
         N = chooseSize(loiAve,step)
         N = min(N,Nmax)
-        if test < 1000:
-            N1= 0
-            for k in range(N):
-                if npr.rand()<ratio:
-                    N1+=1
-            N2 = N - N1
-            probaTestNeg = ((1-prev1)**N1)* ((1-prev2)**N2)
-            resTest = 1*(npr.rand() > probaTestNeg)
-            for j in range(numberPoints):
-                for k in range(numberPoints):
-                    theta = j*step
-                    phi = k*step
-                    eps = ((1-theta)**N1)*((1-phi)**N2)
-                    if resTest == 1:
-                        loiPrior[j][k] = loiPrior[j][k]*(1-eps)
-                    else:
-                        loiPrior[j][k] = loiPrior[j][k]*eps
-        else:
-            print(test)
-            loiAve1 = [sum(loiPrior[j]) for j in range(numberPoints)]
-            loiAve2 = [sum(loiPrior[:][j]) for j in range(numberPoints)]
-            N1= chooseSize(loiAve1,step)
-            N2= chooseSize(loiAve2,step)
-            probaTest1Neg = (1 - prev1)**N1
-            probaTest2Neg = (1-prev2)**N2
-            resTest1 = 1*(npr.rand()>probaTest1Neg)
-            resTest2 = 1*(npr.rand()>probaTest2Neg)
-            for j in range(numberPoints):
-                for k in range(numberPoints):
-                    theta = j * step
-                    phi = k * step
-                    eps1 = (1-theta)**N1
-                    eps2 = (1-phi)**N2
-                    if resTest1 == 1:
-                        loiPrior[j][k] = loiPrior[j][k]*(1-eps1)
-                    else:
-                        loiPrior[j][k] = loiPrior[j][k]*eps1
-                    if resTest2 == 1:
-                        loiPrior[j][k] = loiPrior[j][k]*(1-eps2)
-                    else:
-                        loiPrior[j][k] = loiPrior[j][k]*eps2
 
+        N1= 0
+        for k in range(N):
+            if npr.rand()<ratio:
+                N1+=1
+        N2 = N - N1
+        probaTestNeg = ((1-prev1)**N1)* ((1-prev2)**N2)
+        resTest = 1*(npr.rand() > probaTestNeg)
+        for j in range(numberPoints):
+            for k in range(numberPoints):
+                theta = j*step
+                phi = k*step
+                eps = ((1-theta)**N1)*((1-phi)**N2)
+                if resTest == 1:
+                    loiPrior[j][k] = loiPrior[j][k]*(1-eps)
+                else:
+                    loiPrior[j][k] = loiPrior[j][k]*eps
         med, bs, bi, med1, bs1, bi1, med2, bs2, bi2, loiAve = binormalize(loiPrior,ratio)
 
         listeMed.append(med*step)
@@ -322,28 +298,22 @@ def measureOfPrevalenceBidim(prev1, prev2, ratio, nombreTests,Nmax,step):
         listeBi2.append(bi2*step)
         listeBs2.append(bs2*step)
 
-
-    xAbsciss = [j+1 for j in range(999)]
-    k = 0
-    while len(xAbsciss) < len(listeMed):
-        xAbsciss.append(1000 + 2*k)
-        k+=1
-    plt.plot(xAbsciss,listeMed)
-    plt.plot(xAbsciss,listeBi)
-    plt.plot(xAbsciss,listeBs)
-    plt.savefig("images/copymeasureOfPrevalenceBiDim.pdf")
+    plt.plot(listeMed)
+    plt.plot(listeBi)
+    plt.plot(listeBs)
+    plt.savefig("images/measureOfPrevalenceBiDim.pdf")
     plt.show()
     plt.clf()
-    plt.plot(xAbsciss,listeMed1)
-    plt.plot(xAbsciss,listeBi1)
-    plt.plot(xAbsciss,listeBs1)
-    plt.savefig("images/copymeasureOfPrevalenceBiDim1.pdf")
+    plt.plot(listeMed1)
+    plt.plot(listeBi1)
+    plt.plot(listeBs1)
+    plt.savefig("images/measureOfPrevalenceBiDim1.pdf")
     plt.show()
     plt.clf()
-    plt.plot(xAbsciss,listeMed2)
-    plt.plot(xAbsciss,listeBi2)
-    plt.plot(xAbsciss,listeBs2)
-    plt.savefig("images/copymeasureOfPrevalenceBiDim2.pdf")
+    plt.plot(listeMed2)
+    plt.plot(listeBi2)
+    plt.plot(listeBs2)
+    plt.savefig("images/measureOfPrevalenceBiDim2.pdf")
     plt.show()
     plt.clf()
     
@@ -352,41 +322,41 @@ def measureOfPrevalenceBidim(prev1, prev2, ratio, nombreTests,Nmax,step):
     listeMed2Crop = [[],[]]
     for j in range(len(listeMed)):
         if listeMed[j]<0.1:
-            listeMedCrop[0].append(xAbsciss[j])
+            listeMedCrop[0].append(j)
             listeMedCrop[1].append(listeMed[j])
         if listeMed1[j]<0.1:
-            listeMed1Crop[0].append(xAbsciss[j])
+            listeMed1Crop[0].append(j)
             listeMed1Crop[1].append(listeMed1[j])
         if listeMed2[j]<0.1:
-            listeMed2Crop[0].append(xAbsciss[j])
+            listeMed2Crop[0].append(j)
             listeMed2Crop[1].append(listeMed2[j])
     plt.plot(listeMedCrop[0],listeMedCrop[1])
     plt.plot(listeMed1Crop[0],listeMed1Crop[1])
     plt.plot(listeMed2Crop[0],listeMed2Crop[1])
-    plt.savefig("images/copymeasurePrevalenceCropped.pdf")
+    plt.savefig("images/measurePrevalenceCropped.pdf")
     plt.show()
     plt.clf()
 
-    plt.plot(xAbsciss,listeMed)
-    plt.plot(xAbsciss,listeBi)
-    plt.plot(xAbsciss,listeBs)
-    plt.plot(xAbsciss,listeMed1)
-    plt.plot(xAbsciss,listeBi1)
-    plt.plot(xAbsciss,listeBs1)
-    plt.plot(xAbsciss,listeMed2)
-    plt.plot(xAbsciss,listeBi2)
-    plt.plot(xAbsciss,listeBs2)
-    plt.savefig("images/copymeasureOfPrevalenceBiDimTot.pdf")
+    plt.plot(listeMed)
+    plt.plot(listeBi)
+    plt.plot(listeBs)
+    plt.plot(listeMed1)
+    plt.plot(listeBi1)
+    plt.plot(listeBs1)
+    plt.plot(listeMed2)
+    plt.plot(listeBi2)
+    plt.plot(listeBs2)
+    plt.savefig("images/measureOfPrevalenceBiDimTot.pdf")
     plt.show()
     plt.clf()
     
     listeI = [listeBs[j] - listeBi[j] for j in range(len(listeBs))]
     listeI1 = [listeBs1[j] - listeBi1[j] for j in range(len(listeBs))]
     listeI2 = [listeBs2[j] - listeBi2[j] for j in range(len(listeBs))]
-    plt.semilogy(xAbsciss,listeI)
-    plt.semilogy(xAbsciss,listeI1)
-    plt.semilogy(xAbsciss,listeI2)
-    plt.savefig("images/copywidthOfCIsemilog.pdf")
+    plt.semilogy(listeI)
+    plt.semilogy(listeI1)
+    plt.semilogy(listeI2)
+    plt.savefig("images/widthOfCIsemilog.pdf")
     plt.show()
     plt.clf()
 
@@ -559,7 +529,7 @@ def measureOfPrevalenceMultidim(prevalences,proportions, nombreTests,Nmax,number
 
     for d in range(numberSubPop+1):
         plt.plot(resMed[d])
-    plt.savefig("images/copymeasureOfPrevalenceMultiDimMedians.pdf")
+    plt.savefig("images/measureOfPrevalenceMultiDimMedians.pdf")
     plt.show()
     plt.clf()
 
@@ -567,7 +537,7 @@ def measureOfPrevalenceMultidim(prevalences,proportions, nombreTests,Nmax,number
         plt.plot(resMed[d])
         plt.plot(resBi[d])
         plt.plot(resBs[d])
-    plt.savefig("images/copymeasureOfPrevalenceMultiDim.pdf")
+    plt.savefig("images/measureOfPrevalenceMultiDim.pdf")
     plt.show()
     plt.clf()
 
@@ -603,21 +573,8 @@ def measureOfPrevalenceMultidim(prevalences,proportions, nombreTests,Nmax,number
 
 
 
-# listeMed, listeBi, listeBs, listeMed1, listeBi1, listeBs1, listeMed2, listeBi2, listeBs2 = measureOfPrevalenceBidim(0.005,0.05,.8,2000,200,0.0005)
+# measureOfPrevalenceUnidim(0.05,2000,200,0.00001)
 
-measureOfPrevalenceBidim(0.005,0.05,.8,1500,200,0.0005)
+measureOfPrevalenceBidim(0.005,0.05,.8,2000,200,0.0005)
 
 # measureOfPrevalenceMultidim([0.01,0.02,0.03],[0.3,0.4,0.3],2000,200,10000,0.01)
-
-
-
-# for prev in [0.01,0.03,0.05,0.15]:
-#     print(prev)
-#     listeMed, listeBi, listeBs = measureOfPrevalenceUnidim(prev,2000,50,0.00001)
-#     # plt.xlabel("Number of tests")
-#     # plt.ylabel("Width of credibility interval")
-#     plt.semilogy([listeBs[k]-listeBi[k] for k in range(len(listeBs))])
-# plt.savefig("images/copyimgCovidCommon.pdf")
-# plt.show()
-# plt.clf()
-
